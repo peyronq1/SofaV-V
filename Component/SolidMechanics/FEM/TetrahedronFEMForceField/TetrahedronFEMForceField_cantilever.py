@@ -2,7 +2,21 @@ import Sofa
 import numpy as np
 from splib3.numerics import Vec3
 
-def createScene(rootNode):
+def getConfig():
+    # list of parameters to be varied
+    param = ["Meshfile density"]
+    # minimum value, per parameter
+    min = [0.1]
+    # maximum value, per parameter
+    max = [0.5]
+    # number of samples
+    nb = [5]
+    # number of simulation iterations
+    Niter = [10]
+
+    return param,min,max,Niter
+
+def createScene(rootNode, param):
     rootNode.addObject("FreeMotionAnimationLoop")
     rootNode.addObject("GenericConstraintSolver")
     rootNode.addObject("VisualStyle", displayFlags='showBehavior')
@@ -20,7 +34,7 @@ def createScene(rootNode):
     for k in range(0,len(list_mesh)):
 
         beam = modeling.addChild("Beam" +str(k))
-        beam.addObject('MeshVTKLoader', filename='../../../Mesh/'+list_mesh[k],name="loader"+str(k),translation=[0.0, k*30.0,0.0])
+        beam.addObject('MeshVTKLoader', filename='Mesh/'+list_mesh[k],name="loader"+str(k),translation=[0.0, k*30.0,0.0])
         beam.addObject('MeshTopology', src = "@loader"+str(k))
         beam.addObject('MechanicalObject',showObject=True,showObjectScale = 2.,name='dof')
         beam.addObject('UniformMass',totalMass=0.000001)
