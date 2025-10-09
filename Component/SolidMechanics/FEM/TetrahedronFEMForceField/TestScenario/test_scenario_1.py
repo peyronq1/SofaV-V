@@ -1,6 +1,18 @@
+
+#--------------------------------- Test scenario 1 --------------------------
+#--------------------------------- Cantilever Beam --------------------------
+# ---------------------------------------------------------------------------
+# Author: Quentin Peyron
+
 import Sofa
 import numpy as np
 from splib3.numerics import Vec3
+import csv
+import time
+
+object_path = "Component/SolidMechanics/FEM/TetrahedronFEMForceField/"
+
+#----------------------------- The configuration function --------------------
 
 def getConfig():
     # list of parameters to be varied
@@ -12,9 +24,11 @@ def getConfig():
     # number of samples
     nb = [5]
     # number of simulation iterations
-    Niter = [10]
+    Niter = [20]
 
     return param,min,max,nb,Niter
+
+#----------------------------- The scene creation --------------------
 
 def createScene(rootNode, param):
 
@@ -74,9 +88,6 @@ def createScene(rootNode, param):
 
     simulation.addChild(beam)
 
-    print("Tip box indices:")
-    print(str(tip_mo.position.value))
-
     rootNode.addObject(ErrorEvaluation(rootNode=rootNode, tip_mo = tip_mo))
 
 def findMeanPoint(list_points):
@@ -84,6 +95,9 @@ def findMeanPoint(list_points):
     for k in range (1,len(list_points)):
         mean_point += Vec3(list_points[k])
     return mean_point/len(list_points)
+
+#----------------------------- The controller for the data generation --------------------
+
 
 class ErrorEvaluation(Sofa.Core.Controller):
 
@@ -95,24 +109,23 @@ class ErrorEvaluation(Sofa.Core.Controller):
 
         mean_pos = self.tip_mo.position.value[0]
         self.pos_z_init = mean_pos[2]
-        print("Simulated data")
-        print(str(self.pos_z_init))
 
-        self.disp_z = []
-        self.disp_z_gt = []
+        self.disp_z = 0
+        self.disp_z_gt = 0
         # self.time = 0
         self.iter = 0
         self.flag = False
+
+        self.prev_time = time.time()
 
         param,min,max,nb,Niter = getConfig()
         self.Niter = Niter[0]
 
     def onAnimateBeginEvent(self,event):
 
-        if self.iter>=self.Niter and not self.flag:
-            # Simulated data
-            # pos = self.list_beam[k].dof.position.value
-            # mean_pos = findMeanPoint(pos[self.list_indices[k]])
+
+        if self.iter>=self.Niter-10 and not self.flag:
+
             mean_pos = self.tip_mo.position.value[0]
             self.disp_z = abs(self.pos_z_init-mean_pos[2])
 
@@ -122,15 +135,48 @@ class ErrorEvaluation(Sofa.Core.Controller):
             E = 1.0
             F = 1.0e-2
             L = 100.0
-            self.disp_z_gt.append(F*L**3/(3*E*I))
+            self.disp_z_gt = F*L**3/(3*E*I) 
+
+            error = abs(self.disp_z-self.disp_z_gt)
 
             print("Simulated data")
             print(str(self.disp_z))
             print("Theoretical data")
             print(str(self.disp_z_gt))
+
+            elaspsed_time = time.time()-self.prev_time
+            self.prev_time = time.time()
+
+            # Add the new data to the existing data file, or create the data file
+
+            data = []
+
+            try:
+                f = open(object_path + 'Data/test_scenario_1.csv', newline='')
+            except FileNotFoundError:
+                data = []
+            else:
+                # with open(object_path + 'Data/test_scenario_1.csv' , newline='') as f:
+                reader = csv.reader(f, delimiter=',', quotechar='|')
+                for row in reader:
+                    data_row = []
+                    print("Row length: "+str(len(row)))
+                    for k in range(0,len(row)):
+                        data_row.append(float(row[k]))
+                    data.append(data_row)
+
+            data.append([elaspsed_time, error])
+
+            with open(object_path + 'Data/test_scenario_1.csv' , 'w', newline='') as f:
+                # using csv.writer method from CSV package
+                write = csv.writer(f, delimiter=',',
+                                    quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                
+                for k in range(0,len(data)):
+                    write.writerow(data[k])
+
             self.flag=True
 
-        # self.time += self.root_node.dt.value
         self.iter += 1 
 
 

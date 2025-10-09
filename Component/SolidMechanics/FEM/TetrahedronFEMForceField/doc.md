@@ -4,7 +4,7 @@
 
 ### Description
 
-A cantilever beam is a beam, so an elastic body at least 10 times longer in one direction than the others, which is clamped at one end. In this scenario, we consider a force to be applied at the tip of the beam.
+A cantilever beam is a beam, so an elastic body at least 10 times longer in one direction than the others, which is clamped at one end. In this scenario, we consider a force to be applied at the tip of the beam. We investigate how the mesh density influence the accuracy and computation time of the model.
 
 ### Groundtruth
 
@@ -34,7 +34,24 @@ where:
 
 Description:
 
+Describe the scene, how the mesh is generated and the link with the mesh density, and the elements allowing the error to be computed, here the mapped point at the tip of the beam.
+
+Parameters:
+| Name | Symbol | Nominal value|
+| ------- | ------ | -------|
+| Young's modulus | $E$ |  1 MPa |
+| Beam radius | $r$ | 3 mm |
+| Force magnitude | $F$ | 0.01 N |
+
+
 Error metrics:
+
+$$ E = \left| \Delta p_z - \tilde{\Delta p_z} \right| $$
+
+where:
+* $\tilde{\Delta p_z}$ is the vertical displacement of the mapped point at the beam tip obtained in simulation 
 
 
 ### Results
+
+![Error plot](./Data/test_scenario_1.png)
