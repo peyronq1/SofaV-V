@@ -10,27 +10,33 @@ from splib3.numerics import Vec3
 import csv
 import time
 
-object_path = "Component/SolidMechanics/FEM/TetrahedronFEMForceField/"
+object_path = "Static/LinearElastic/Bending/CantileverBeam/"
 
 #----------------------------- The configuration function --------------------
 
 def getConfig():
     # list of parameters to be varied
-    param = ["Meshfile density"]
+    name = ["Number of elements along x", "Number of elements along y,z"]
+    # nominal value, per parameter
+    nom = [10,5]
     # minimum value, per parameter
-    min = [0.1]
+    min = [10,2]
     # maximum value, per parameter
-    max = [0.5]
+    max = [110,22]
     # number of samples
-    nb = [5]
+    nb = [10,10]
     # number of simulation iterations
-    Niter = [20]
+    Niter = [30,30]
 
-    return param,min,max,nb,Niter
+    return name,nom,min,max,nb,Niter
 
 #----------------------------- The scene creation --------------------
 
-def createScene(rootNode, param):
+def createScene(rootNode, param_idx, param):
+
+    # Unpack parameter vector
+    Nx = int(param[0])
+    Ne = int(param[1])
 
     rootNode.addObject('RequiredPlugin', name='SoftRobots')
     rootNode.addObject('RequiredPlugin', name='SofaPython3')
@@ -53,6 +59,8 @@ def createScene(rootNode, param):
         "Sofa.Component.MechanicalLoad",
         "Sofa.GL.Component.Rendering3D",  # Needed to use components OglModel
         "Sofa.Component.Topology.Container.Dynamic",
+        "Sofa.Component.Topology.Container.Grid",
+        "Sofa.Component.Topology.Mapping",
     ])
     rootNode.addObject('RequiredPlugin', name='CSparseSolvers')
 
@@ -63,16 +71,25 @@ def createScene(rootNode, param):
 
     modeling = rootNode.addChild('Modeling')
     simulation = rootNode.addChild('Simulation')
-    simulation.addObject('EulerImplicitSolver')
+    simulation.addObject('EulerImplicitSolver',firstOrder = True)
     simulation.addObject('SparseLDLSolver')
     simulation.addObject('GenericConstraintCorrection')
-    
+
     beam = modeling.addChild("Beam")
-    beam.addObject('MeshVTKLoader', filename='Component/SolidMechanics/FEM/TetrahedronFEMForceField/Mesh/cylindre_0p'+str(int(param*10)) + '.vtk',name="loader",translation=[0.0, 0.0,0.0])
-    beam.addObject('MeshTopology', src = "@loader")
+
+    # Create a regular tetrahedron mesh with controlled number of element in the 3 dimensiosn
+    topo = beam.addObject('RegularGridTopology', name='grid', n = [Nx,Ne+1,Ne+1], min = [0.0,-5.0/2,-5.0/2], max = [100.0,5.0/2,5.0/2])
+    topo.init()
+
+    beam.addObject('TetrahedronSetTopologyContainer', name= 'container', position=topo.position.value)
+    beam.addObject('TetrahedronSetTopologyModifier')
+    beam.addObject('TetrahedronSetGeometryAlgorithms', template="Vec3")
+    beam.addObject('Hexa2TetraTopologicalMapping', input="@grid", output="@container")
+
+    # Physical properties
     beam.addObject('MechanicalObject',showObject=True,showObjectScale = 2.,name='dof')
-    beam.addObject('UniformMass',totalMass=0.000001)
-    beam.addObject('TetrahedronFEMForceField',youngModulus=1.,poissonRatio=0.0)
+    beam.addObject('UniformMass',totalMass=0.001)
+    beam.addObject('TetrahedronFEMForceField',youngModulus=50.,poissonRatio=0.0)
 
     box = beam.addObject('BoxROI',box=[[-0.1, -10.0 + 0.0, -10.0], [0.1, 10.0 + 0.0, 10.0]], drawBoxes = True, name = "box")
     box.init()
@@ -88,13 +105,7 @@ def createScene(rootNode, param):
 
     simulation.addChild(beam)
 
-    rootNode.addObject(ErrorEvaluation(rootNode=rootNode, tip_mo = tip_mo))
-
-def findMeanPoint(list_points):
-    mean_point = Vec3(list_points[0])
-    for k in range (1,len(list_points)):
-        mean_point += Vec3(list_points[k])
-    return mean_point/len(list_points)
+    rootNode.addObject(ErrorEvaluation(rootNode=rootNode, tip_mo = tip_mo, param_idx=param_idx))
 
 #----------------------------- The controller for the data generation --------------------
 
@@ -106,6 +117,7 @@ class ErrorEvaluation(Sofa.Core.Controller):
 
         self.root_node = kwargs['rootNode']
         self.tip_mo = kwargs['tip_mo']
+        self.param_idx = kwargs['param_idx']
 
         mean_pos = self.tip_mo.position.value[0]
         self.pos_z_init = mean_pos[2]
@@ -118,41 +130,42 @@ class ErrorEvaluation(Sofa.Core.Controller):
 
         self.prev_time = time.time()
 
-        param,min,max,nb,Niter = getConfig()
+        name,nom,min,max,nb,Niter = getConfig()
         self.Niter = Niter[0]
 
     def onAnimateBeginEvent(self,event):
 
+        elaspsed_time = time.time()-self.prev_time
+        self.prev_time = time.time()
+        # print("prevTime = "+str(self.prev_time))
 
-        if self.iter>=self.Niter-10 and not self.flag:
+        if self.iter>=self.Niter-2 and not self.flag:
 
             mean_pos = self.tip_mo.position.value[0]
             self.disp_z = abs(self.pos_z_init-mean_pos[2])
 
             # Theoretical data
-            r = 5.0
-            I = (np.pi*(r**4)/4.0)
-            E = 1.0
+            e = 5.0
+            I = (e**4)/12.0
+            E = 50.0
             F = 1.0e-2
             L = 100.0
             self.disp_z_gt = F*L**3/(3*E*I) 
 
-            error = abs(self.disp_z-self.disp_z_gt)
+            error = abs(self.disp_z-self.disp_z_gt)*100.0/abs(self.disp_z_gt)
 
             print("Simulated data")
             print(str(self.disp_z))
             print("Theoretical data")
             print(str(self.disp_z_gt))
 
-            elaspsed_time = time.time()-self.prev_time
-            self.prev_time = time.time()
-
+            
             # Add the new data to the existing data file, or create the data file
 
             data = []
 
             try:
-                f = open(object_path + 'Data/test_scenario_1.csv', newline='')
+                f = open(object_path + 'Data/test_scene_1_'+str(self.param_idx+1)+'.csv', newline='')
             except FileNotFoundError:
                 data = []
             else:
@@ -167,7 +180,7 @@ class ErrorEvaluation(Sofa.Core.Controller):
 
             data.append([elaspsed_time, error])
 
-            with open(object_path + 'Data/test_scenario_1.csv' , 'w', newline='') as f:
+            with open(object_path + 'Data/test_scene_1_'+str(self.param_idx+1)+'.csv' , 'w', newline='') as f:
                 # using csv.writer method from CSV package
                 write = csv.writer(f, delimiter=',',
                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)

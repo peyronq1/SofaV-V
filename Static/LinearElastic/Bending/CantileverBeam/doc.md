@@ -1,6 +1,4 @@
-# TetrahedronFEMForceField
-
-## Case study 1: Cantilever beam - bending
+# Cantilever beam
 
 ### Description
 
@@ -23,12 +21,23 @@ Assumptions:
 Equations:
 
 We assume the beam deforms in the $(x,z)$ plane and is aligned with the $x$ axis at rest. For a tip force in the $(0,-1)$ direction, the vertical displacement at the tip $\Delta p_z$ of the beam is:
-$$ \Delta p_z = \frac{F L^3}{3 E I} $$
+$$ \Delta p_z = \frac{F L^3}{3 E I} = 1.28 mm $$
 where:
 * $F$ is the tip force magnitude in N
 * $L$ is the beam length in m
 * $E$ is the Young's modulus of the beam material in Pa
-* $I$ is the second moment of area of the beam's cross section in m $^4$. For a circular cross-section of radius $r$, $I=\pi r^4/4$
+* $I$ is the second moment of area of the beam's cross section in m $^4$. A square cross-section of side $r$ is considered, giving $I=r^4/12$
+
+Parameters:
+| Variable | Nominal value|
+| ------ | -------|
+| $E$ |  50 MPa |
+| $F$ | 0.01 N |
+| $r$ | 5 mm |
+| $L$ | 100 mm |
+
+
+## Test scene 1: Co-rotationnal FEM with tetrahedron elements
 
 ### Scene
 
@@ -36,17 +45,11 @@ Description:
 
 Describe the scene, how the mesh is generated and the link with the mesh density, and the elements allowing the error to be computed, here the mapped point at the tip of the beam.
 
-Parameters:
-| Name | Symbol | Nominal value|
-| ------- | ------ | -------|
-| Young's modulus | $E$ |  1 MPa |
-| Beam radius | $r$ | 3 mm |
-| Force magnitude | $F$ | 0.01 N |
 
 
 Error metrics:
 
-$$ E = \left| \Delta p_z - \tilde{\Delta p_z} \right| $$
+$$ \epsilon = 100.0*\frac{\left| \Delta p_z - \tilde{\Delta p_z} \right|}{\left|\tilde{\Delta p_z} \right|}  $$
 
 where:
 * $\tilde{\Delta p_z}$ is the vertical displacement of the mapped point at the beam tip obtained in simulation 
@@ -54,4 +57,5 @@ where:
 
 ### Results
 
-![Error plot](./Data/test_scenario_1.png)
+![Error plot](./Data/test_scene_1_1.png)
+![Error plot](./Data/test_scene_1_2.png)
