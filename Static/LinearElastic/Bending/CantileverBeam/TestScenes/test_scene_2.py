@@ -88,15 +88,10 @@ def createScene(rootNode, cs_param, param_idx, param):
     topo = beam.addObject('RegularGridTopology', name='grid', n = [Nx,Ne+1,Ne+1], min = [0.0,-r/2,-r/2], max = [L,r/2,r/2])
     topo.init()
 
-    beam.addObject('TetrahedronSetTopologyContainer', name= 'container', position=topo.position.value)
-    beam.addObject('TetrahedronSetTopologyModifier')
-    beam.addObject('TetrahedronSetGeometryAlgorithms', template="Vec3")
-    beam.addObject('Hexa2TetraTopologicalMapping', input="@grid", output="@container")
-
     # Physical properties
     beam.addObject('MechanicalObject',showObject=True,showObjectScale = 2.,name='dof')
     beam.addObject('UniformMass',totalMass=0.001)
-    beam.addObject('TetrahedronFEMForceField',youngModulus=E,poissonRatio=0.0)
+    beam.addObject('HexahedronFEMForceField',youngModulus=E,poissonRatio=0.0)
 
     box = beam.addObject('BoxROI',box=[[-0.1, -r, -r], [0.1, r, r]], drawBoxes = True, name = "box")
     box.init()
@@ -152,28 +147,15 @@ class ErrorEvaluation(Sofa.Core.Controller):
             mean_pos = self.tip_mo.position.value[0]
             self.disp_z = abs(self.pos_z_init-mean_pos[2])
 
-            # Theoretical data
-            # e = 5.0
-            # I = (e**4)/12.0
-            # E = 50.0
-            # F = 1.0e-2
-            # L = 100.0
-            # self.disp_z_gt = F*L**3/(3*E*I) 
-
-            # error = abs(self.disp_z-self.disp_z_gt)*100.0/abs(self.disp_z_gt)
-
             print("Simulated data")
             print(str(self.disp_z))
-            # print("Theoretical data")
-            # print(str(self.disp_z_gt))
 
-            
             # Add the new data to the existing data file, or create the data file
 
             data = []
 
             try:
-                f = open(caseStudy_path + 'Data/test_scene_1_'+str(self.param_idx+1)+'.csv', newline='')
+                f = open(caseStudy_path + 'Data/test_scene_2_'+str(self.param_idx+1)+'.csv', newline='')
             except FileNotFoundError:
                 data = []
             else:
@@ -181,16 +163,14 @@ class ErrorEvaluation(Sofa.Core.Controller):
                 reader = csv.reader(f, delimiter=',', quotechar='|')
                 for row in reader:
                     data_row = []
-                    print("Row length: "+str(len(row)))
                     for k in range(0,len(row)):
                         data_row.append(float(row[k]))
                     data.append(data_row)
 
-            # data.append([elaspsed_time, error])
             mean_elapsed_time = np.mean(list(self.elapsed_time[k] for k in range(1,len(self.elapsed_time)-1)))
             data.append([mean_elapsed_time, self.disp_z])
 
-            with open(caseStudy_path + 'Data/test_scene_1_'+str(self.param_idx+1)+'.csv' , 'w', newline='') as f:
+            with open(caseStudy_path + 'Data/test_scene_2_'+str(self.param_idx+1)+'.csv' , 'w', newline='') as f:
                 # using csv.writer method from CSV package
                 write = csv.writer(f, delimiter=',',
                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)

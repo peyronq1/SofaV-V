@@ -8,9 +8,9 @@ A cantilever beam is a beam, so an elastic body at least 10 times longer in one 
 
 Could be analytical (mention the assumptions and equations), numerical (mention the algorithms, git repo, or database where the data are stored) or experimental (mention the database where the data are stored)
 
-Type: Analytical
+**Type:** Analytical
 
-Assumptions:
+**Assumptions:**
 * Beam assumptions: slender elastic body that can be defined by a centerline and composed of of non-deformable cross-sections
 * The beam position is fixed at (0,0) at the base
 * A force with a constant orientation and magnitude is applied at the tip
@@ -18,7 +18,7 @@ Assumptions:
 * The beam is incompressible
 * The material is isotropic, linear and elastic
 
-Equations:
+**Equations:**
 
 We assume the beam deforms in the $(x,z)$ plane and is aligned with the $x$ axis at rest. For a tip force in the $(0,-1)$ direction, the vertical displacement at the tip $\Delta p_z$ of the beam is:
 $$ \Delta p_z = \frac{F L^3}{3 E I} = 1.28 mm $$
@@ -28,7 +28,7 @@ where:
 * $E$ is the Young's modulus of the beam material in Pa
 * $I$ is the second moment of area of the beam's cross section in m $^4$. A square cross-section of side $r$ is considered, giving $I=r^4/12$
 
-Parameters:
+**Parameters:**
 | Variable | Nominal value|
 | ------ | -------|
 | $E$ |  50 MPa |
@@ -36,18 +36,7 @@ Parameters:
 | $r$ | 5 mm |
 | $L$ | 100 mm |
 
-
-## Test scene 1: Co-rotationnal FEM with tetrahedron elements
-
-### Scene
-
-Description:
-
-Describe the scene, how the mesh is generated and the link with the mesh density, and the elements allowing the error to be computed, here the mapped point at the tip of the beam.
-
-
-
-Error metrics:
+**Error metrics:**
 
 $$ \epsilon = 100.0*\frac{\left| \Delta p_z - \tilde{\Delta p_z} \right|}{\left|\tilde{\Delta p_z} \right|}  $$
 
@@ -55,7 +44,78 @@ where:
 * $\tilde{\Delta p_z}$ is the vertical displacement of the mapped point at the beam tip obtained in simulation 
 
 
+
+## Test scene 1: Co-rotationnal FEM with tetrahedron elements
+
+### Scene description
+
+**Base attachment:** 
+
+Selection of all the nodes in the cross-section at the beam's base and application of a projective fixing constraint (FixedProjectiveConstraint)
+
+**Elastic deformations:** 
+
+Beam with square cross-section. The mesh is generated with a RegularGridTopology, and converted in a tetrahedral mesh with the Hexa2TetraTopologicalMapping. The number of elements along the beam length (x axis) and in the cross section (along y and z axis) can therefore be defined. Linear elasticity is added with a TetrahedronFEMForceField. The co-rotational model is selected with the option method = 'large'.
+
+**Force application:** 
+
+A ConstantForceField is applied with a total force in the negative z axis direction, on aall the node belonging to the cross-section at the tip of the beam. 
+
+**Tip position computation:**
+
+A single point is added at the tip location of the beam's neutral axis and is linked to the mesh using a BarycentricMapping. The displacement of this point along the z axis is taken as the beam deflection $\tilde{\Delta p_z}$.
+
 ### Results
 
 ![Error plot](./Data/test_scene_1_1.png)
 ![Error plot](./Data/test_scene_1_2.png)
+
+## Test scene 2: Co-rotationnal FEM with hexahedron elements
+
+### Scene description
+
+**Base attachment:** 
+
+Selection of all the nodes in the cross-section at the beam's base and application of a projective fixing constraint (FixedProjectiveConstraint)
+
+**Elastic deformations:** 
+
+Beam with square cross-section. The mesh is generated with a RegularGridTopology. The number of elements along the beam length (x axis) and in the cross section (along y and z axis) can therefore be defined. Linear elasticity is added with a HexahedronFEMForceField. The co-rotational model is selected with the option method = 'large'.
+
+**Force application:** 
+
+A ConstantForceField is applied with a total force in the negative z axis direction, on aall the node belonging to the cross-section at the tip of the beam. 
+
+**Tip position computation:**
+
+A single point is added at the tip location of the beam's neutral axis and is linked to the mesh using a BarycentricMapping. The displacement of this point along the z axis is taken as the beam deflection $\tilde{\Delta p_z}$.
+
+### Results
+
+![Error plot](./Data/test_scene_2_1.png)
+![Error plot](./Data/test_scene_2_2.png)
+
+## Test scene 3: Linea FEM with tetrahedron elements
+
+### Scene description
+
+**Base attachment:** 
+
+Selection of all the nodes in the cross-section at the beam's base and application of a projective fixing constraint (FixedProjectiveConstraint)
+
+**Elastic deformations:** 
+
+Beam with square cross-section. The mesh is generated with a RegularGridTopology. The number of elements along the beam length (x axis) and in the cross section (along y and z axis) can therefore be defined. Linear elasticity is added with a HexahedronFEMForceField. The linear model is selected with the option method = 'small'.
+
+**Force application:** 
+
+A ConstantForceField is applied with a total force in the negative z axis direction, on aall the node belonging to the cross-section at the tip of the beam. 
+
+**Tip position computation:**
+
+A single point is added at the tip location of the beam's neutral axis and is linked to the mesh using a BarycentricMapping. The displacement of this point along the z axis is taken as the beam deflection $\tilde{\Delta p_z}$.
+
+### Results
+
+![Error plot](./Data/test_scene_3_1.png)
+![Error plot](./Data/test_scene_3_2.png)
