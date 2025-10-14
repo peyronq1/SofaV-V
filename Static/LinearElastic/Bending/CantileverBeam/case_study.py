@@ -1,5 +1,10 @@
 import numpy as np
 
+def get_scenario_id():
+
+    index = 1
+    return index
+
 def get_parameters():
     name = ["Force","Young's modulus","Length","Cross-section width"]
     F = 0.01

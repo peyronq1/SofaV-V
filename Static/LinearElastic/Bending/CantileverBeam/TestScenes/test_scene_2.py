@@ -1,5 +1,5 @@
 
-#--------------------------------- Test scenario 1 --------------------------
+#--------------------------------- Test scenario 2 --------------------------
 #--------------------------------- Cantilever Beam --------------------------
 # ---------------------------------------------------------------------------
 # Author: Quentin Peyron
@@ -11,6 +11,12 @@ import csv
 import time
 
 caseStudy_path = "Static/LinearElastic/Bending/CantileverBeam/"
+
+def get_name():
+
+    name = "Co-rotational FEM with hexa elements"
+
+    return name
 
 #----------------------------- The configuration function --------------------
 

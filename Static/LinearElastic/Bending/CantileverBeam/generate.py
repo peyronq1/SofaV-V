@@ -3,12 +3,19 @@ import importlib
 import os
 import matplotlib.pyplot as plt
 import csv
+import case_studies
+import case_study
 
-caseStudy_path = "Static/LinearElastic/Bending/CantileverBeam/"
+# caseStudy_path = "Static/LinearElastic/Bending/CantileverBeam/"
+
+
+list_testScenarios = case_studies.get_list()
+caseStudy_path = list_testScenarios[case_study.get_scenario_id()-1].replace('.','/')+'/'
+caseStudy = importlib.import_module(list_testScenarios[case_study.get_scenario_id()-1])
 
 # caseStudy = importlib.import_module("Static.LinearElastic.Bending.CantileverBeam.case_study")
 
-caseStudy = importlib.import_module(caseStudy_path.replace('/','.')+"case_study")
+# caseStudy = importlib.import_module(caseStudy_path.replace('/','.')+"case_study")
 
 def generate():
     # Need to scan all the test scenario in the TestScenario folder and generate the corresponding data
@@ -31,16 +38,12 @@ def generate_testScene(testSceneIndex):
 
 
 def generate_data(testSceneIndex):
-    
-    print("Test")
 
     name,caseStudy_param = caseStudy.get_parameters()
 
     testScene = importlib.import_module(caseStudy_path.replace('/','.')+"TestScenes.test_scene_"+str(testSceneIndex))
 
     name,nom_value,min_value,max_value,nb,Niter = testScene.get_parameters()
-
-    print("Niter: " + str(Niter))
 
     for k in range(0,len(name)):
         param = nom_value.copy()
@@ -51,10 +54,10 @@ def generate_data(testSceneIndex):
             root = Sofa.Core.Node("root") # Generate the root node     
             testScene.createScene(root, caseStudy_param, k, param) # Create the scene graph
             Sofa.Simulation.init(root) # Initialization of the scene graph
-            for step in range(Niter[k]):
-                print("param = "+str(nom_value))
-                print("w = " +str(w) + "/" + str(nb[k]))
-                print("Simulation step: " +str(step) + "/" + str(Niter[k]))
+            for step in range(0,Niter[k]):
+                print("param nominal value = "+str(nom_value))
+                print("w = " +str(w+1) + "/" + str(nb[k]))
+                print("Simulation step: " +str(step+1) + "/" + str(Niter[k]))
                 Sofa.Simulation.animate(root, root.dt.value)
 
             Sofa.Simulation.reset(root)

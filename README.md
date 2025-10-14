@@ -25,15 +25,11 @@ Executing the following command will generate only the data of the desired case 
 python3 main_generate_all.py idCaseStudy idTestScene
 ```
 
-## Case studies and test scenario
+Executing the following command will regenerate the summary table of the case studies and test scenarios bellow.
 
-| Case study | Name | Test scene | Name|
-|------------|-------|------------|------|     
-| 1 | Static Bending Cantilever Beam | 1 | Co-rotational FEM with tetra elements|
-|  |  | 2 | Co-rotational FEM with hexa elements|
-|  |  | 3 | Linear FEM with tetra elements|
-| 2 | Static Bending Force Follower |  | no test scene yet |
-| 3 | Static Extension Cantilever Beam |  | no test scene yet |
+```console
+python3 main_generate_readme.py 
+```
 
 ## Contributing
 
@@ -41,3 +37,14 @@ python3 main_generate_all.py idCaseStudy idTestScene
 
 ### Adding new case studies
 
+## Case studies and test scenario
+
+| Case study | Name | Test scene | Name | 
+| ---------- | ---- | ---------- | ---- | 
+| 0 | Static.LinearElastic.Bending.CantileverBeam | | | 
+| |  | 1 | Co-rotational FEM with tetra elements WAZAAA | 
+| |  | 2 | Co-rotational FEM with hexa elements | 
+| |  | 3 | Linear FEM with tetra elements | 
+| 1 | Static.LinearElastic.Bending.ForceFollower | | | 
+| |  | 1 | Co-rotational FEM with tetra elements | 
+| 2 | Static.LinearElastic.Extension.CantileverBeam | | | 

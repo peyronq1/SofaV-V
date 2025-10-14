@@ -1,18 +1,29 @@
 
 #--------------------------------- Test scenario 1 --------------------------
-#--------------------------------- Cantilever Beam --------------------------
-# ---------------------------------------------------------------------------
 # Author: Quentin Peyron
+#----------------------------------------------------------------------------
 
 import Sofa
 import numpy as np
 from splib3.numerics import Vec3
 import csv
 import time
+import case_studies
 
-caseStudy_path = "Static/LinearElastic/Bending/CantileverBeam/"
 
-#----------------------------- The configuration function --------------------
+
+#----------------------------- The description of the test scene --------------------
+
+def get_scenario_id():
+
+    index = 1
+    return index
+
+def get_name():
+
+    name = "Co-rotational FEM with tetra elements"
+    return name
+
 
 def get_parameters():
     # list of parameters to be varied
@@ -24,11 +35,15 @@ def get_parameters():
     # maximum value, per parameter
     max = [300,22]
     # number of samples
-    nb = [30,10]
+    nb = [5,5]
     # number of simulation iterations
-    Niter = [30,30]
+    Niter = [5,5]
 
     return name,nom,min,max,nb,Niter
+
+list_testScenarios = case_studies.get_list()
+caseStudy_path = list_testScenarios[get_scenario_id()-1].replace('.','/')+'/'
+
 
 #----------------------------- The scene creation --------------------
 
@@ -152,21 +167,8 @@ class ErrorEvaluation(Sofa.Core.Controller):
             mean_pos = self.tip_mo.position.value[0]
             self.disp_z = abs(self.pos_z_init-mean_pos[2])
 
-            # Theoretical data
-            # e = 5.0
-            # I = (e**4)/12.0
-            # E = 50.0
-            # F = 1.0e-2
-            # L = 100.0
-            # self.disp_z_gt = F*L**3/(3*E*I) 
-
-            # error = abs(self.disp_z-self.disp_z_gt)*100.0/abs(self.disp_z_gt)
-
             print("Simulated data")
             print(str(self.disp_z))
-            # print("Theoretical data")
-            # print(str(self.disp_z_gt))
-
             
             # Add the new data to the existing data file, or create the data file
 

@@ -55,7 +55,7 @@ Selection of all the nodes in the cross-section at the beam's base and applicati
 
 **Elastic deformations:** 
 
-Beam with square cross-section. The mesh is generated with a RegularGridTopology, and converted in a tetrahedral mesh with the Hexa2TetraTopologicalMapping. The number of elements along the beam length (x axis) and in the cross section (along y and z axis) can therefore be defined. Linear elasticity is added with a TetrahedronFEMForceField. The co-rotational model is selected with the option method = 'large'.
+Beam with square cross-section. The mesh is generated with a RegularGridTopology, and converted in a tetrahedral mesh with the Hexa2TetraTopologicalMapping. The number of elements along the beam length (x axis) and in the cross section (along y and z axis) can therefore be defined. Linear elasticity is added with a TetrahedronFEMForceField. The co-rotational model is selected with the option method = 'large'. The Poisson ratio is set to 0.0 to enforce the elements just elongate along the neutral fiber and do not deform in the other directions, as the beam cross-section must be constant. 
 
 **Force application:** 
 
@@ -65,10 +65,27 @@ A ConstantForceField is applied with a total force in the negative z axis direct
 
 A single point is added at the tip location of the beam's neutral axis and is linked to the mesh using a BarycentricMapping. The displacement of this point along the z axis is taken as the beam deflection $\tilde{\Delta p_z}$.
 
+### Parameters
+
+| Variable | Nominal value| Min value | Max value |
+| -------| -------| -------| -------| 
+| Number of elements along x |  10 | 10 | 300 |
+| Number of elements along y and z | 5 | 2 | 22 |
+
+
 ### Results
 
 ![Error plot](./Data/test_scene_1_1.png)
 ![Error plot](./Data/test_scene_1_2.png)
+
+### PC specifications
+
+Model: HP HP EliteBook x360 1040 G8 Notebook PC
+
+CPU: 11th Gen Intel® Core™ i7-1185G7 @ 3.00GHz × 8
+
+RAM: 16 GB
+
 
 ## Test scene 2: Co-rotationnal FEM with hexahedron elements
 
@@ -80,7 +97,8 @@ Selection of all the nodes in the cross-section at the beam's base and applicati
 
 **Elastic deformations:** 
 
-Beam with square cross-section. The mesh is generated with a RegularGridTopology. The number of elements along the beam length (x axis) and in the cross section (along y and z axis) can therefore be defined. Linear elasticity is added with a HexahedronFEMForceField. The co-rotational model is selected with the option method = 'large'.
+Beam with square cross-section. The mesh is generated with a RegularGridTopology. The number of elements along the beam length (x axis) and in the cross section (along y and z axis) can therefore be defined. Linear elasticity is added with a HexahedronFEMForceField. The co-rotational model is selected with the option method = 'large'. The Poisson ratio is set to 0.0 to enforce the elements just elongate along the neutral fiber and do not deform in the other directions, as the beam cross-section must be constant. 
+
 
 **Force application:** 
 
@@ -90,10 +108,27 @@ A ConstantForceField is applied with a total force in the negative z axis direct
 
 A single point is added at the tip location of the beam's neutral axis and is linked to the mesh using a BarycentricMapping. The displacement of this point along the z axis is taken as the beam deflection $\tilde{\Delta p_z}$.
 
+### Parameters
+
+| Variable | Nominal value| Min value | Max value |
+| -------| -------| -------| -------| 
+| Number of elements along x |  10 | 10 | 300 |
+| Number of elements along y and z | 5 | 2 | 22 |
+
+
 ### Results
 
 ![Error plot](./Data/test_scene_2_1.png)
 ![Error plot](./Data/test_scene_2_2.png)
+
+### PC specifications
+
+Model: HP HP EliteBook x360 1040 G8 Notebook PC
+
+CPU: 11th Gen Intel® Core™ i7-1185G7 @ 3.00GHz × 8
+
+RAM: 16 GB
+
 
 ## Test scene 3: Linea FEM with tetrahedron elements
 
@@ -105,7 +140,8 @@ Selection of all the nodes in the cross-section at the beam's base and applicati
 
 **Elastic deformations:** 
 
-Beam with square cross-section. The mesh is generated with a RegularGridTopology. The number of elements along the beam length (x axis) and in the cross section (along y and z axis) can therefore be defined. Linear elasticity is added with a HexahedronFEMForceField. The linear model is selected with the option method = 'small'.
+Beam with square cross-section. The mesh is generated with a RegularGridTopology. The number of elements along the beam length (x axis) and in the cross section (along y and z axis) can therefore be defined. Linear elasticity is added with a HexahedronFEMForceField. The linear model is selected with the option method = 'small'. The Poisson ratio is set to 0.0 to enforce the elements just elongate along the neutral fiber and do not deform in the other directions, as the beam cross-section must be constant. 
+
 
 **Force application:** 
 
@@ -115,7 +151,22 @@ A ConstantForceField is applied with a total force in the negative z axis direct
 
 A single point is added at the tip location of the beam's neutral axis and is linked to the mesh using a BarycentricMapping. The displacement of this point along the z axis is taken as the beam deflection $\tilde{\Delta p_z}$.
 
+### Parameters
+
+| Variable | Nominal value| Min value | Max value |
+| -------| -------| -------| -------| 
+| Number of elements along x |  10 | 10 | 300 |
+| Number of elements along y and z | 5 | 2 | 22 |
+
 ### Results
 
 ![Error plot](./Data/test_scene_3_1.png)
 ![Error plot](./Data/test_scene_3_2.png)
+
+### PC specifications
+
+Model: HP HP EliteBook x360 1040 G8 Notebook PC
+
+CPU: 11th Gen Intel® Core™ i7-1185G7 @ 3.00GHz × 8
+
+RAM: 16 GB
