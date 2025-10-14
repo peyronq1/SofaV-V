@@ -5,7 +5,7 @@ import importlib
 
 if __name__ ==  "__main__":
 
-    list_testScenarios = case_studies.get_list()
+    list_caseStudies = case_studies.get_list()
 
     # Generate the table of content
 
@@ -13,19 +13,19 @@ if __name__ ==  "__main__":
     toc += "| Case study | Name | Test scene | Name | \n"
     toc += "| ---------- | ---- | ---------- | ---- | \n"
 
-    for k in range(0,len(list_testScenarios)):
+    for k in range(0,len(list_caseStudies)):
 
-        caseStudy_path = list_testScenarios[k].replace('.','/')
+        caseStudy = list_caseStudies[k]
 
-        Nscene = len(os.listdir(caseStudy_path+"/TestScenes/"))-1
+        Nscene = len(caseStudy.test_scenes)
 
-        toc += "| " + str(k) + " | " + list_testScenarios[k] + " | | | \n"
+        toc += "| " + str(caseStudy.id) + " | " + caseStudy.name + " | | | \n"
 
         for w in range(0,Nscene):
 
-            testScene = importlib.import_module(list_testScenarios[k]+".TestScenes.test_scene_"+str(w+1))
+            testScene = caseStudy.test_scenes[w]
 
-            toc += "| |  | " + str(w+1) + " | " + testScene.get_name() + " | \n"
+            toc += "| |  | " + str(w+1) + " | " + testScene.name + " | \n"
     
     # Read the current main documentation, remove the table of content
     actualDoc = ""

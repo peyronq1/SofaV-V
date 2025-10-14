@@ -41,10 +41,7 @@ python3 main_generate_readme.py
 
 | Case study | Name | Test scene | Name | 
 | ---------- | ---- | ---------- | ---- | 
-| 0 | Static.LinearElastic.Bending.CantileverBeam | | | 
-| |  | 1 | Co-rotational FEM with tetra elements WAZAAA | 
+| 1 | CantileverBeam | | | 
+| |  | 1 | Co-rotational FEM with tetra elements | 
 | |  | 2 | Co-rotational FEM with hexa elements | 
 | |  | 3 | Linear FEM with tetra elements | 
-| 1 | Static.LinearElastic.Bending.ForceFollower | | | 
-| |  | 1 | Co-rotational FEM with tetra elements | 
-| 2 | Static.LinearElastic.Extension.CantileverBeam | | | 
