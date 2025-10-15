@@ -1,5 +1,5 @@
 
-#--------------------------------- Test scenario 2 --------------------------
+#--------------------------------- Test scenario 3 --------------------------
 # Author: Quentin Peyron
 #----------------------------------------------------------------------------
 
@@ -9,35 +9,35 @@ from splib3.numerics import Vec3
 import csv
 import time
 
-
 #----------------------------- The description of the test scene --------------------
 
 class TestScene():
 
     def __init__(self,*args,**kwargs):
 
-        self.name = "Co-rotational FEM with hexa elements"
+        self.name = "Constant strain Cosserat elements"
 
         # list of parameters to be varied
-        self.param_name = ["Number of elements along x", "Number of elements along y,z"]
+        self.param_name = ["Number of sections","Number of frames per section"]
         # nominal value, per parameter
-        self.nom = [10,5]
+        self.nom = [2,2]
         # minimum value, per parameter
-        self.min = [10,2]
+        self.min = [1,2]
         # maximum value, per parameter
-        self.max = [300,22]
+        self.max = [30,32]
         # number of samples
-        self.nb = [30,10]
+        self.nb = [30,30]
         # number of simulation iterations
         self.Niter = [30,30]
-
+        
     #----------------------------- The scene creation --------------------
 
     def createScene(self,rootNode, cs_param, param_idx, param, caseStudy_path):
 
         # Unpack test scene parameter vector
-        Nx = int(param[0])
-        Ne = int(param[1])
+        Ns = int(param[0])
+        Nfr = int(param[1])
+        # print("TEST Nx = " + str(Nx))
 
         # Unpack case study parameter vector
         F = cs_param[0]
@@ -47,6 +47,8 @@ class TestScene():
 
 
         rootNode.addObject('RequiredPlugin', name='SoftRobots')
+        rootNode.addObject('RequiredPlugin', name='BeamAdapter')
+        rootNode.addObject('RequiredPlugin', name='Cosserat')
         rootNode.addObject('RequiredPlugin', name='SofaPython3')
         rootNode.addObject('RequiredPlugin', pluginName=[
             "Sofa.Component.AnimationLoop",  # Needed to use components FreeMotionAnimationLoop
@@ -83,30 +85,45 @@ class TestScene():
 
         beam = modeling.addChild("Beam")
 
-        # Create a regular tetrahedron mesh with controlled number of element in the 3 dimensiosn
-        topo = beam.addObject('RegularGridTopology', name='grid', n = [Nx,Ne+1,Ne+1], min = [0.0,-r/2,-r/2], max = [L,r/2,r/2])
+        # Cosserat rod definition
+        curvature = []
+        s_curv = [0.0]
+        seg_length = []
+        for k in range(0,Ns):
+            curvature.append([0.0,0.0,0.0])
+            s_curv.append((k+1)*L/(Ns))
+            seg_length.append(L/(Ns))
+
+        rigidBase = beam.addChild("RigidBase")
+        rigidBase.addObject('MechanicalObject',template='Rigid3',position=[0.0,0.0,0.0,0.0,0.0,0.0,1.0],name = 'rigid_base_mo')
+
+        internState = beam.addChild("InternalState")
+        internState.addObject('MechanicalObject',template='Vec3',position=curvature, name = 'cosserat_state_mo')
+        internState.addObject("BeamHookeLawForceField", length = seg_length, crossSectionShape = 'rectangular', lengthY = r, lengthZ = r, youngModulus = E, poissonRatio = 0.0 )
+
+        frameState = internState.addChild("CosseratFrames")
+
+        # Create a regular 1D mesh with a controlled number of elements
+        topo = frameState.addObject('RegularGridTopology', name='grid', n = [Ns*Nfr+1,1,1], min = [0.0,0.0,0.0], max = [L,0.0,0.0],drawEdges=False)
         topo.init()
+        s_frame = list(k*L/(Ns*Nfr) for k in range(0,Ns*Nfr+1))
 
         # Physical properties
-        beam.addObject('MechanicalObject',showObject=True,showObjectScale = 2.,name='dof')
-        beam.addObject('UniformMass',totalMass=0.001)
-        beam.addObject('HexahedronFEMForceField',youngModulus=E,poissonRatio=0.0)
+        mo = frameState.addObject('MechanicalObject',template = 'Rigid3', showObject=True, showObjectScale = 1.0, name='cosserat_frame_mo', position="@grid.position")
+        frameState.addObject('UniformMass', totalMass=1e-6)
 
-        box = beam.addObject('BoxROI',box=[[-0.1, -r, -r], [0.1, r, r]], drawBoxes = True, name = "box")
-        box.init()
-        beam.addObject('FixedProjectiveConstraint',indices='@box.indices')
+        frameState.addObject('DiscreteCosseratMapping',curv_abs_input = s_curv, curv_abs_output = s_frame, name = "CosseratMapping", 
+                             input1 = internState.cosserat_state_mo.getLinkPath(), input2 = rigidBase.rigid_base_mo.getLinkPath(), 
+                             output = frameState.cosserat_frame_mo.getLinkPath(), debug = 0, radius = r)
 
-        beam.addObject('BoxROI', box=[[L-0.1, -r, -r], [L+0.1, r, r]], drawBoxes=True, name="box2")
-        # box2.init()
-        beam.addObject('ConstantForceField', indices='@box2.indices', totalForce = [0.0,0.0,-F])
 
-        tip = beam.addChild("TipBarycenter")
-        tip_mo = tip.addObject('MechanicalObject',position=[L,0.0,0.0], name='tip_mo')
-        tip.addObject('BarycentricMapping')
+        rigidBase.addObject('FixedProjectiveConstraint',indices = 0)
+
+        frameState.addObject('ConstantForceField', indices=Ns*Nfr, totalForce = [0.0,0.0,-F])
 
         simulation.addChild(beam)
 
-        rootNode.addObject(ErrorEvaluation(rootNode=rootNode, tip_mo = tip_mo, param_idx=param_idx, caseStudy_path = caseStudy_path, Niter = self.Niter[param_idx]))
+        rootNode.addObject(ErrorEvaluation(rootNode=rootNode, beam_mo = mo, param_idx=param_idx, caseStudy_path = caseStudy_path, Niter = self.Niter[param_idx]))
 
     #----------------------------- The controller for the data generation --------------------
 
@@ -117,12 +134,13 @@ class ErrorEvaluation(Sofa.Core.Controller):
         Sofa.Core.Controller.__init__(self,*args,**kwargs)
 
         self.root_node = kwargs['rootNode']
-        self.tip_mo = kwargs['tip_mo']
+        self.beam_mo = kwargs['beam_mo']
         self.param_idx = kwargs['param_idx']
         self.caseStudy_path = kwargs['caseStudy_path']
         self.Niter = kwargs["Niter"]
 
-        mean_pos = self.tip_mo.position.value[0]
+        print("position = " +str(self.beam_mo.position.value))
+        mean_pos = self.beam_mo.position.value[-1]
         self.pos_z_init = mean_pos[2]
 
         self.disp_z = 0
@@ -141,7 +159,7 @@ class ErrorEvaluation(Sofa.Core.Controller):
 
         if self.iter>=self.Niter-2 and not self.flag:
 
-            mean_pos = self.tip_mo.position.value[0]
+            mean_pos = self.beam_mo.position.value[-1]
             self.disp_z = abs(self.pos_z_init-mean_pos[2])
 
             print("Simulated data")
@@ -152,11 +170,10 @@ class ErrorEvaluation(Sofa.Core.Controller):
             data = []
 
             try:
-                f = open(self.caseStudy_path + '/Data/test_scene_2_'+str(self.param_idx+1)+'.csv', newline='')
+                f = open(self.caseStudy_path + '/Data/test_scene_4_'+str(self.param_idx+1)+'.csv', newline='')
             except FileNotFoundError:
                 data = []
             else:
-                # with open(object_path + 'Data/test_scenario_1.csv' , newline='') as f:
                 reader = csv.reader(f, delimiter=',', quotechar='|')
                 for row in reader:
                     data_row = []
@@ -165,11 +182,10 @@ class ErrorEvaluation(Sofa.Core.Controller):
                         data_row.append(float(row[k]))
                     data.append(data_row)
 
-            # data.append([elaspsed_time, error])
             mean_elapsed_time = np.mean(list(self.elapsed_time[k] for k in range(1,len(self.elapsed_time)-1)))
             data.append([mean_elapsed_time, self.disp_z])
 
-            with open(self.caseStudy_path + '/Data/test_scene_2_'+str(self.param_idx+1)+'.csv' , 'w', newline='') as f:
+            with open(self.caseStudy_path + '/Data/test_scene_4_'+str(self.param_idx+1)+'.csv' , 'w', newline='') as f:
                 # using csv.writer method from CSV package
                 write = csv.writer(f, delimiter=',',
                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -180,3 +196,5 @@ class ErrorEvaluation(Sofa.Core.Controller):
             self.flag=True
 
         self.iter += 1 
+
+

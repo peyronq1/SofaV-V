@@ -10,6 +10,8 @@ class CaseStudy(CaseStudyTemplate):
 
         super().__init__(*args,**kwargs)
 
+        self.error_unit = ""
+
     def generate_data(self, testSceneIndex):
 
         name,caseStudy_param = self.get_parameters()
@@ -28,7 +30,7 @@ class CaseStudy(CaseStudyTemplate):
                 testScene.createScene(root, caseStudy_param, k, param, caseStudy_path) # Create the scene graph
                 Sofa.Simulation.init(root) # Initialization of the scene graph
                 for step in range(0,testScene.Niter[k]):
-                    print("param nominal value = "+str(testScene.nom))
+                    print("param value = "+str(param_value))
                     print("w = " +str(w+1) + "/" + str(testScene.nb[k]))
                     print("Simulation step: " +str(step+1) + "/" + str(testScene.Niter[k]))
                     Sofa.Simulation.animate(root, root.dt.value)
@@ -61,12 +63,12 @@ class CaseStudy(CaseStudyTemplate):
 
             ax_error[0].plot(param_value,error,'bo')
             ax_error[0].set_xlabel(testScene.param_name[k])
-            ax_error[0].set_ylabel('Error')
+            ax_error[0].set_ylabel('Error ('+self.error_unit+')')
             ax_error[0].grid()
 
             ax_error[1].plot(param_value,elapsed_time,'bo')
             ax_error[1].set_xlabel(testScene.param_name[k])
-            ax_error[1].set_ylabel('Computation time per iteration (s)')
+            ax_error[1].set_ylabel('Mean computation time per iteration (s)')
             ax_error[1].grid()
 
             fig_error.savefig(self.path+self.name +"/Data/test_scene_"+str(testSceneIndex)+"_"+str(k+1)+".png", transparent=None, dpi='figure', format=None,
@@ -95,6 +97,7 @@ class CaseStudy(CaseStudyTemplate):
         return disp
 
     def generate_error(self,gt_value,sim_value):
-        
+
+        self.error_unit = "%"
         return abs(sim_value-gt_value)*100.0/abs(gt_value)
 

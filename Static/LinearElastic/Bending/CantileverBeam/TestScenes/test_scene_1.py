@@ -27,9 +27,9 @@ class TestScene():
         # maximum value, per parameter
         self.max = [300,22]
         # number of samples
-        self.nb = [5,5]
+        self.nb = [30,10]
         # number of simulation iterations
-        self.Niter = [5,5]
+        self.Niter = [30,30]
         
     #----------------------------- The scene creation --------------------
 
@@ -72,8 +72,7 @@ class TestScene():
         ])
         rootNode.addObject('RequiredPlugin', name='CSparseSolvers')
 
-        rootNode.addObject("FreeMotionAnimationLoop")
-        rootNode.addObject("GenericConstraintSolver")
+        rootNode.addObject("DefaultAnimationLoop")
         rootNode.addObject("VisualStyle", displayFlags='showBehavior')
         rootNode.gravity.value = [0.0,0.0,0.0]
 
@@ -81,7 +80,6 @@ class TestScene():
         simulation = rootNode.addChild('Simulation')
         simulation.addObject('EulerImplicitSolver',firstOrder = True)
         simulation.addObject('SparseLDLSolver')
-        simulation.addObject('GenericConstraintCorrection')
 
         beam = modeling.addChild("Beam")
 

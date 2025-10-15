@@ -130,38 +130,78 @@ CPU: 11th Gen Intel® Core™ i7-1185G7 @ 3.00GHz × 8
 RAM: 16 GB
 
 
-## Test scene 3: Linea FEM with tetrahedron elements
+## Test scene 3: Co-rotational FEM with 1D beam elements
 
 ### Scene description
 
 **Base attachment:** 
 
-Selection of all the nodes in the cross-section at the beam's base and application of a projective fixing constraint (FixedProjectiveConstraint)
+Selection of the node at the beam's base and application of a projective fixing constraint (FixedProjectiveConstraint)
 
 **Elastic deformations:** 
 
-Beam with square cross-section. The mesh is generated with a RegularGridTopology. The number of elements along the beam length (x axis) and in the cross section (along y and z axis) can therefore be defined. Linear elasticity is added with a HexahedronFEMForceField. The linear model is selected with the option method = 'small'. The Poisson ratio is set to 0.0 to enforce the elements just elongate along the neutral fiber and do not deform in the other directions, as the beam cross-section must be constant. 
-
+Beam with square cross-section. The 1D mesh is generated with a RegularGridTopology. The number of elements along the beam length (x axis) can therefore be defined. Linear elasticity is added with a BeamInterpolation and AdaptiveBeamForceFieldAndMass. The Poisson ratio is set to 0.0.
 
 **Force application:** 
 
-A ConstantForceField is applied with a total force in the negative z axis direction, on aall the node belonging to the cross-section at the tip of the beam. 
+A ConstantForceField is applied with a total force in the negative z axis direction, on the node at the tip of the beam. 
 
 **Tip position computation:**
 
-A single point is added at the tip location of the beam's neutral axis and is linked to the mesh using a BarycentricMapping. The displacement of this point along the z axis is taken as the beam deflection $\tilde{\Delta p_z}$.
+The tip location is taken as the position of the last node of the 1D mesh. The displacement of this point along the z axis is taken as the beam deflection $\tilde{\Delta p_z}$.
 
 ### Parameters
 
 | Variable | Nominal value| Min value | Max value |
 | -------| -------| -------| -------| 
-| Number of elements along x |  10 | 10 | 300 |
-| Number of elements along y and z | 5 | 2 | 22 |
+| Number of elements along x |  2 | 50 | 30 |
+
 
 ### Results
 
 ![Error plot](./Data/test_scene_3_1.png)
-![Error plot](./Data/test_scene_3_2.png)
+
+### PC specifications
+
+Model: HP HP EliteBook x360 1040 G8 Notebook PC
+
+CPU: 11th Gen Intel® Core™ i7-1185G7 @ 3.00GHz × 8
+
+RAM: 16 GB
+
+## Test scene 4: Constant strain Cosserat elements
+
+### Scene description
+
+**Base attachment:** 
+
+Selection of the node at the beam's base and application of a projective fixing constraint (FixedProjectiveConstraint)
+
+**Elastic deformations:** 
+
+Beam with square cross-section. The beam is discretized in $N_s$ sections with constant bending and torsion strains. Extension and shear are not allowed. This is enforced by defining the strain state of the Cosserat rod with a Vec3 template. Linear elasticity is added to this state with a BeamHookeLawForceField. he Poisson ratio is set to 0.0. The 1D mesh corresponding to the beam position and orientation is generated with a RegularGridTopology. The number of elements along the beam length (x axis) can therefore be defined. It is linked to the strain state with a DiscreteCosseratMapping.
+
+**Force application:** 
+
+A ConstantForceField is applied with a total force in the negative z axis direction, on the node at the tip of the beam. 
+
+**Tip position computation:**
+
+The tip location is taken as the position of the last node of the 1D mesh. The displacement of this point along the z axis is taken as the beam deflection $\tilde{\Delta p_z}$.
+
+### Parameters
+
+| Variable | Nominal value| Min value | Max value |
+| -------| -------| -------| -------| 
+| Number of sections |  2 | 2 | 30 |
+| Number of frames per section |  2 | 1 | 30 |
+
+
+### Results
+
+![Error plot](./Data/test_scene_4_1.png)
+![Error plot](./Data/test_scene_4_2.png)
+
 
 ### PC specifications
 

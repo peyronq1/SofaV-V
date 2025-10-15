@@ -9,9 +9,9 @@ Each case study directory is structured as follows:
 * "TestScenes" folder containing only one file per test scene
 * "Mesh" folder containing the mesh files eventually required by the test scenes
 * "doc.md" file containing the documentation of the case study and the different test scenes, incorporating the comparison graphs
-* "generate.py" file, to generate automatically the data and plots related to all or one particular test scene.
+* "case_study.py" file, to generate automatically the simulation data, groundtruth data and plots related to all or one particular test scene.
 
-## Command
+## Commands
 
 Executing the following command will generate the data of all test scenes of all case studies. 
 
@@ -31,7 +31,7 @@ Executing the following command will regenerate the summary table of the case st
 python3 main_generate_readme.py 
 ```
 
-## Contributing
+## How to contribute
 
 ### Adding new test scenes
 
@@ -44,4 +44,5 @@ python3 main_generate_readme.py
 | 1 | CantileverBeam | | | 
 | |  | 1 | Co-rotational FEM with tetra elements | 
 | |  | 2 | Co-rotational FEM with hexa elements | 
-| |  | 3 | Linear FEM with tetra elements | 
+| |  | 3 | Co-rotational FEM with 1D beam elements | 
+| |  | 4 | Constant strain Cosserat elements | 
