@@ -1,4 +1,6 @@
-# SofaV-V
+# ![logo Sofa V&V](./Utils/logo.png) SofaV-V 
+
+
 
 This project aims at providing a template, a structure and data for the verification and validation of Sofa scenes in different scenarios of deformation. The test scenes are structured according to the case study considered. This case study must correspond to practical scenarios where groundtruth data are available, whether these data are given by analytical or numerical models previously validated with experiments, or are experimental values directly. The goal is then to evaluate the performance of the test scene and plot the resulting graph to obtain finally a tractable documentation.
 

@@ -6,8 +6,6 @@ A cantilever beam is a beam, so an elastic body at least 10 times longer in one 
 
 ### Groundtruth
 
-Could be analytical (mention the assumptions and equations), numerical (mention the algorithms, git repo, or database where the data are stored) or experimental (mention the database where the data are stored)
-
 **Type:** Analytical
 
 **Assumptions:**
