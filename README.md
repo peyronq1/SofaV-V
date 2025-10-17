@@ -24,7 +24,7 @@ python3 main_generate_all.py
 Executing the following command will generate only the data of the desired case study and test scene. The indices of both can be found in the table below
 
 ```console
-python3 main_generate_all.py idCaseStudy idTestScene
+python3 main_generate.py idCaseStudy idTestScene
 ```
 
 Executing the following command will regenerate the summary table of the case studies and test scenarios bellow.
@@ -45,6 +45,8 @@ In case_study.py, the case study must be defined as a python class called "CaseS
 - `set_parameters()`: to get the list of physical parameters required to compute the groundtruth, that must be reused by the test scene.
 - `gt_value = compute_groundtruth()`: to compute the groundtruth values from the physical parameters, either using an analytical solution of the problem or a numerical one. Could also return experimental values, that would have to be stored in a csv file (in the Data folder for example).
 - `error = compute_error()`: to compute the error between the groundtruth and the simulated data. Different expressions could be used, such as relative or absolute errors. In this function, the user must also specify the error unit to be displayed on the graphs.
+
+In doc.md, the documentation for the whole case study must be given. The first step is to describe the case study. A schematics can help understand better than long paragraphs. The groundtruth should then be described. It could be analytical (mention then the assumptions and equations), numerical (mention the algorithms, git repo, or database where the data are stored) or experimental (mention the database where the data are stored). The last point before describing the test scenes is to provide the expression of the error metric used in the graphs. Regarding the test scenes, the documentation consists essentially in describing the Sofa scene, in particular the objects used, a Results section where the generated graphs have to be displayed, and a section indicating the specifications of the computer having generated the data.
 
 Finally, in case_studies.py, at the root of the V&V directory, the case study must be added to the list following the template given. The CaseStudy class must be created with the corresponding name, id and paths, and must be added to the list returned by `get_list()`.
 
