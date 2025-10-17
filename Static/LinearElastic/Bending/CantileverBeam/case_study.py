@@ -10,11 +10,9 @@ class CaseStudy(CaseStudyTemplate):
 
         super().__init__(*args,**kwargs)
 
-        self.error_unit = ""
+        self.set_parameters()
 
     def generate_data(self, testSceneIndex):
-
-        name,caseStudy_param = self.get_parameters()
 
         testScene = self.test_scenes[testSceneIndex-1]
 
@@ -27,7 +25,7 @@ class CaseStudy(CaseStudyTemplate):
                 caseStudy_path = self.path+self.name
                 
                 root = Sofa.Core.Node("root") # Generate the root node     
-                testScene.createScene(root, caseStudy_param, k, param, caseStudy_path) # Create the scene graph
+                testScene.createScene(root, self.param, k, param, caseStudy_path) # Create the scene graph
                 Sofa.Simulation.init(root) # Initialization of the scene graph
                 for step in range(0,testScene.Niter[k]):
                     print("param value = "+str(param_value))
@@ -41,9 +39,7 @@ class CaseStudy(CaseStudyTemplate):
 
     def generate_plot(self, testSceneIndex):
 
-        name,caseStudy_param = self.get_parameters()
-
-        gt_value = self.generate_groundtruth(caseStudy_param)
+        gt_value = self.compute_groundtruth()
 
         testScene = self.test_scenes[testSceneIndex-1]
         
@@ -57,7 +53,7 @@ class CaseStudy(CaseStudyTemplate):
             with open(self.path+self.name + "/Data/test_scene_"+str(testSceneIndex)+"_"+str(k+1)+".csv",newline = '') as f:
                 reader  = csv.reader(f, delimiter=',', quotechar='|')
                 for row in reader:
-                    error.append(self.generate_error(gt_value,float(row[1])))
+                    error.append(self.compute_error(gt_value,float(row[1])))
                     elapsed_time.append(float(row[0]))
 
 
@@ -76,27 +72,27 @@ class CaseStudy(CaseStudyTemplate):
             facecolor='auto', edgecolor='auto', backend=None)
 
 
-    def get_parameters(self):
+    def set_parameters(self):
         name = ["Force","Young's modulus","Length","Cross-section width"]
         F = 0.01
         E = 50.0
         L = 100.0
         r = 5.0
-        value = [F,E,L,r]
-        return name,value
+        self.param_name = name
+        self.param = [F,E,L,r]
 
-    def generate_groundtruth(self,param):
-        F = param[0]
-        E = param[1]
-        L = param[2]
-        r = param[3]
+    def compute_groundtruth(self):
+        F = self.param[0]
+        E = self.param[1]
+        L = self.param[2]
+        r = self.param[3]
 
         I = (r**4)/12
         disp = F*(L**3)/(3*E*I)
 
         return disp
 
-    def generate_error(self,gt_value,sim_value):
+    def compute_error(self,gt_value,sim_value):
 
         self.error_unit = "%"
         return abs(sim_value-gt_value)*100.0/abs(gt_value)

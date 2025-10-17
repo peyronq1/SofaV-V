@@ -16,6 +16,10 @@ class CaseStudyTemplate:
             dir = importlib.import_module(self.include_path+self.name+".TestScenes.test_scene_"+str(k+1))
             testScene = dir.TestScene()
             self.test_scenes.append(testScene)
+        
+        self.error_unit = ""
+        self.param = []
+        self.param_name = []
 
     def generate(self):
     # Need to scan all the test scenario in the TestScenario folder and generate the corresponding data
@@ -71,13 +75,13 @@ class CaseStudyTemplate:
     def generate_plot(self,testSceneIndex):
         return 0
     
-    def get_parameters(self):
+    def set_parameters(self):
         return 0
     
-    def generate_groundtruth(self,param):
+    def compute_groundtruth(self,param):
         return 0
     
-    def generate_error(self,gt_value,sim_value):
+    def compute_error(self,gt_value,sim_value):
         return 0
 
 

@@ -19,7 +19,7 @@ if __name__ ==  "__main__":
 
         Nscene = len(caseStudy.test_scenes)
 
-        toc += "| " + str(caseStudy.id) + " | " + caseStudy.name + " | | | \n"
+        toc += "| " + str(caseStudy.id) + " | " + caseStudy.path+' '+caseStudy.name + " | | | \n"
 
         for w in range(0,Nscene):
 

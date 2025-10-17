@@ -2,7 +2,7 @@
 
 ### Description
 
-A cantilever beam is a beam, so an elastic body at least 10 times longer in one direction than the others, which is clamped at one end. In this scenario, we consider a force to be applied at the tip of the beam. We investigate how the mesh density influence the accuracy and computation time of the model.
+A cantilever beam is a beam, so an elastic body at least 10 times longer in one direction than the others, which is clamped at one end. In this scenario, we consider a force to be applied at the tip along an axis orthogonal to the beam's principal axis. We investigate how the mesh density influence the accuracy and computation time of the model when estimating the beam deflection.
 
 ### Groundtruth
 
@@ -15,7 +15,7 @@ Could be analytical (mention the assumptions and equations), numerical (mention 
 * The beam position is fixed at (0,0) at the base
 * A force with a constant orientation and magnitude is applied at the tip
 * The deformations are small: the non-linearities due to the beam orientation are negligible 
-* The beam is incompressible
+* The beam length is constant
 * The material is isotropic, linear and elastic
 
 **Equations:**
@@ -24,9 +24,9 @@ We assume the beam deforms in the $(x,z)$ plane and is aligned with the $x$ axis
 $$ \Delta p_z = \frac{F L^3}{3 E I} = 1.28 mm $$
 where:
 * $F$ is the tip force magnitude in N
-* $L$ is the beam length in m
-* $E$ is the Young's modulus of the beam material in Pa
-* $I$ is the second moment of area of the beam's cross section in m $^4$. A square cross-section of side $r$ is considered, giving $I=r^4/12$
+* $L$ is the beam length in mm
+* $E$ is the Young's modulus of the beam material in MPa
+* $I$ is the second moment of area of the beam's cross section in mm $^4$. A square cross-section of side $r$ is considered, giving $I=r^4/12$
 
 **Parameters:**
 | Variable | Nominal value|
@@ -193,8 +193,8 @@ The tip location is taken as the position of the last node of the 1D mesh. The d
 
 | Variable | Nominal value| Min value | Max value |
 | -------| -------| -------| -------| 
-| Number of sections |  2 | 2 | 30 |
-| Number of frames per section |  2 | 1 | 30 |
+| Number of sections |  10 | 2 | 100 |
+| Number of frames per section |  2 | 1 | 32 |
 
 
 ### Results

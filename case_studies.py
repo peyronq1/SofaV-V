@@ -16,6 +16,13 @@ def get_list():
     caseStudy_current = importlib.import_module(include_path+name+".case_study")
     case1 = caseStudy_current.CaseStudy(name=name, path=path, include_path=include_path, id =id)
 
+    id = 2
+    name = "CantileverBeam"
+    path = "Static/LinearElastic/Extension/"
+    include_path = path.replace('/','.')
+    caseStudy_current = importlib.import_module(include_path+name+".case_study")
+    case2 = caseStudy_current.CaseStudy(name=name, path=path, include_path=include_path, id =id)
+
     # name = "ForceFollower"
     # path = "Static/LinearElastic/Bending/"
     # include_path = "Static.LinearElastic.Bending."
@@ -30,4 +37,4 @@ def get_list():
     # test_scenes = []
     # case3 = utils.CaseStudyTemplate(name=name, path=path, include_path=include_path, id =id, test_scenes = test_scenes)
 
-    return [case1]
+    return [case1,case2]

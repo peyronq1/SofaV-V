@@ -44,6 +44,8 @@ class TestScene():
         L = cs_param[2]
         r = cs_param[3]
 
+        print("param: " + str(cs_param))
+
 
         rootNode.addObject('RequiredPlugin', name='SoftRobots')
         rootNode.addObject('RequiredPlugin', name='BeamAdapter')
@@ -122,7 +124,7 @@ class ErrorEvaluation(Sofa.Core.Controller):
         self.caseStudy_path = kwargs['caseStudy_path']
         self.Niter = kwargs["Niter"]
 
-        print("position = " +str(self.beam_mo.position.value))
+        # print("position = " +str(self.beam_mo.position.value))
         mean_pos = self.beam_mo.position.value[-1]
         self.pos_z_init = mean_pos[2]
 
@@ -145,8 +147,8 @@ class ErrorEvaluation(Sofa.Core.Controller):
             mean_pos = self.beam_mo.position.value[-1]
             self.disp_z = abs(self.pos_z_init-mean_pos[2])
 
-            print("Simulated data")
-            print(str(self.disp_z))
+            # print("Simulated data")
+            # print(str(self.disp_z))
             
             # Add the new data to the existing data file, or create the data file
 
@@ -154,13 +156,14 @@ class ErrorEvaluation(Sofa.Core.Controller):
 
             try:
                 f = open(self.caseStudy_path + '/Data/test_scene_3_'+str(self.param_idx+1)+'.csv', newline='')
+                # f = open('./../Data/test_scene_3_'+str(self.param_idx+1)+'.csv', newline='')
             except FileNotFoundError:
                 data = []
             else:
                 reader = csv.reader(f, delimiter=',', quotechar='|')
                 for row in reader:
                     data_row = []
-                    print("Row length: "+str(len(row)))
+                    # print("Row length: "+str(len(row)))
                     for k in range(0,len(row)):
                         data_row.append(float(row[k]))
                     data.append(data_row)
@@ -169,6 +172,7 @@ class ErrorEvaluation(Sofa.Core.Controller):
             data.append([mean_elapsed_time, self.disp_z])
 
             with open(self.caseStudy_path + '/Data/test_scene_3_'+str(self.param_idx+1)+'.csv' , 'w', newline='') as f:
+            # with open('./../Data/test_scene_3_'+str(self.param_idx+1)+'.csv' , 'w', newline='') as f:
                 # using csv.writer method from CSV package
                 write = csv.writer(f, delimiter=',',
                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)

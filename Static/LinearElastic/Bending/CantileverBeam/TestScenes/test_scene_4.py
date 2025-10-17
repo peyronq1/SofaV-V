@@ -20,11 +20,11 @@ class TestScene():
         # list of parameters to be varied
         self.param_name = ["Number of sections","Number of frames per section"]
         # nominal value, per parameter
-        self.nom = [2,2]
+        self.nom = [10,2]
         # minimum value, per parameter
         self.min = [1,2]
         # maximum value, per parameter
-        self.max = [30,32]
+        self.max = [100,32]
         # number of samples
         self.nb = [30,30]
         # number of simulation iterations
